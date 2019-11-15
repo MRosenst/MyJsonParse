@@ -16,6 +16,22 @@ data JsonValue
   | NullVal ()
   deriving (Show, Eq)
 
+controlSequence :: Parser Char
+controlSequence = do
+  x <- oneOf "\"\\/bfnrtu"
+  case x of
+    'u' -> do
+      code <- count 4 hexDigit
+      case readLitChar $ "\\x" ++ code of
+        [(z,_)] -> return z
+        _ -> unexpected $ "invalid escape code \"\\u" ++ code ++ "\""
+    'b' -> return '\b'
+    'f' -> return '\f'
+    'n' -> return '\n'
+    'r' -> return '\r'
+    't' -> return '\t'
+    y -> return y
+
 str :: Parser JsonValue
 str = do
   let stdChar = satisfy (\c -> not (isControl c) && c `notElem` ("\"" :: String))
@@ -23,20 +39,7 @@ str = do
   content <- many $ do
     c <- stdChar
     case c of
-      '\\' -> do
-        x <- oneOf "\"\\/bfnrtu"
-        case x of
-          'u' -> do
-            code <- count 4 hexDigit
-            case readLitChar $ "\\x" ++ code of
-              [(z,_)] -> return z
-              _ -> unexpected $ "invalid escape code \"\\u" ++ code ++ "\""
-          'b' -> return '\b'
-          'f' -> return '\f'
-          'n' -> return '\n'
-          'r' -> return '\r'
-          't' -> return '\t'
-          y -> return y
+      '\\' -> controlSequence
       x -> return x
 
   char '"'
@@ -109,7 +112,6 @@ array = do
   vals <- jsonvalue `sepBy` (char ',')
   char ']'
   return $ Array vals
-  
 
 jsonvalue :: Parser JsonValue
 jsonvalue = do
