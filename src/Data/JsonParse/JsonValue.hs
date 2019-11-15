@@ -57,9 +57,10 @@ nullval = do
   string "null"
   return $ NullVal ()
 
-numb :: Parser JsonValue
-numb = do
-  -- TODO Fix input consumption issue (hotfix - numb is at the end of the list in func JsonValue)
+double :: Parser JsonValue
+double = do
+  try $ lookAhead (char '-' <|> digit)
+
   minus <- optionMaybe $ char '-'
   let sign = case minus of
               Nothing ->  1
@@ -67,7 +68,7 @@ numb = do
   
   int <- fmap read $ option "0" $ do
     lead <- oneOf "123456789"
-    rest <- option "" $ many1 digit
+    rest <- many digit
     return $ lead : rest
   
   fracStr <- option "0" $ do
@@ -89,19 +90,20 @@ whitespace = do
   many $ oneOf " \t\n\r"
   return ()
 
+keyVal :: Parser (String, JsonValue)
+keyVal = do
+  whitespace
+  String s <- str
+  whitespace
+  char ':'
+  val <- jsonvalue
+  return (s, val)
+
 object :: Parser JsonValue
 object = do
   char '{'
   whitespace
-
-  pairs <- (`sepBy` char ',') $ do
-    whitespace
-    String s <- str
-    whitespace
-    char ':'
-    val <- jsonvalue
-    return (s, val)
-
+  pairs <- keyVal `sepBy` char ','
   char '}'
   return $ Object pairs
 
@@ -116,7 +118,7 @@ array = do
 jsonvalue :: Parser JsonValue
 jsonvalue = do
   whitespace
-  choice [object, str, bool, nullval, array, numb]
+  choice [object, array, str, double, bool, nullval]
 
 json :: Parser JsonValue
 json = object <|> array
