@@ -6,7 +6,7 @@ module Main where
     import Text.Parsec.Text.Lazy
     
     main = do
-      res <- parseFromFile json "test\\test.json"
+      res <- parseFile "test\\test.json"
       case res of
         Left err  -> print err
         Right val -> print val
