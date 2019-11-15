@@ -8,5 +8,5 @@ module Main where
     main = do
       res <- parseFile "test\\test.json"
       case res of
-        Left err  -> print err
+        Left err  -> putStrLn err
         Right val -> print val
