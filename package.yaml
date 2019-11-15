@@ -27,16 +27,16 @@ dependencies:
 library:
   source-dirs: src
 
-executables:
-  my-json-parse-exe:
-    main:                Main.hs
-    source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - my-json-parse
+# executables:
+#   my-json-parse-exe:
+#     main:                Main.hs
+#     source-dirs:         app
+#     ghc-options:
+#     - -threaded
+#     - -rtsopts
+#     - -with-rtsopts=-N
+#     dependencies:
+#     - my-json-parse
 
 tests:
   my-json-parse-test:

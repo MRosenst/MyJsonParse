@@ -1,7 +1,9 @@
-module Lib
+module Data.JsonParse
     ( json
     , JsonValue (..)
     ) where
+
+-- TODO hide parsec implementation details
 
 import Data.Char
 import Text.Parsec
