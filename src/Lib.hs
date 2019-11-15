@@ -11,7 +11,7 @@ data JsonValue
   = Object [(String, JsonValue)]
   | Array [JsonValue]
   | String String
-  | Numb Double
+  | Double Double
   | Bool Bool
   | NullVal ()
   deriving (Show, Eq)
@@ -79,7 +79,7 @@ numb = do
     digs <- many1 digit
     return $ (if expsign == '+' then digs else expsign : digs)
 
-  return $ Numb (sign * (int + frac) * 10 ** fromIntegral exp)
+  return $ Double (sign * (int + frac) * 10 ** fromIntegral exp)
 
 whitespace :: Parser ()
 whitespace = do
