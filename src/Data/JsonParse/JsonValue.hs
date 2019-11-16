@@ -75,13 +75,13 @@ double = do
     char '.'
     many1 digit
   
-  let frac = read fracStr * 10 ** (fromIntegral (- length fracStr))
+  let frac = read fracStr * 10 ** fromIntegral (- length fracStr)
   
   exp <- fmap read $ option "0" $ do
     oneOf "eE"
     expsign <- option '+' $ oneOf "+-"
     digs <- many1 digit
-    return $ (if expsign == '+' then digs else expsign : digs)
+    return $ if expsign == '+' then digs else expsign : digs
 
   return $ Double (sign * (int + frac) * 10 ** fromIntegral exp)
 
@@ -111,7 +111,7 @@ array :: Parser JsonValue
 array = do
   char '['
   whitespace
-  vals <- jsonvalue `sepBy` (char ',')
+  vals <- jsonvalue `sepBy` char ','
   char ']'
   return $ Array vals
 
