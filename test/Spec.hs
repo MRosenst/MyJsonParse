@@ -9,4 +9,4 @@ module Main where
       res <- parseFile "test\\test.json"
       case res of
         Left err  -> putStrLn err
-        Right val -> print val
+        Right val -> print val >> writeFile "test\\output.json" (prettyShow val)
