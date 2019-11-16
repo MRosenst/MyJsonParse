@@ -11,9 +11,9 @@ data JsonValue
   = Object [(String, JsonValue)]
   | Array [JsonValue]
   | String String
-  | Double Double
+  | Number Double
   | Bool Bool
-  | NullVal ()
+  | NullVal
   deriving (Show, Eq)
 
 controlSequence :: Parser Char
@@ -55,10 +55,10 @@ bool = do
 nullval :: Parser JsonValue
 nullval = do
   string "null"
-  return $ NullVal ()
+  return NullVal
 
-double :: Parser JsonValue
-double = do
+number :: Parser JsonValue
+number = do
   try $ lookAhead (char '-' <|> digit)
 
   minus <- optionMaybe $ char '-'
@@ -83,7 +83,7 @@ double = do
     digs <- many1 digit
     return $ if expsign == '+' then digs else expsign : digs
 
-  return $ Double (sign * (int + frac) * 10 ** fromIntegral exp)
+  return $ Number (sign * (int + frac) * 10 ** fromIntegral exp)
 
 whitespace :: Parser ()
 whitespace = do
@@ -118,7 +118,7 @@ array = do
 jsonvalue :: Parser JsonValue
 jsonvalue = do
   whitespace
-  choice [object, array, str, double, bool, nullval]
+  choice [object, array, str, number, bool, nullval]
 
 json :: Parser JsonValue
 json = object <|> array
